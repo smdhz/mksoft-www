@@ -1,0 +1,151 @@
+/* Layout: 左对齐的长卷，左侧一条细线贯穿全页，像一条路线；在路上 / 在线上 是路线上的两站 */
+:root {
+  --ink: #151716;        /* 原站的墨绿黑 */
+  --ink-2: #1c201e;
+  --paper: #e9ebe4;      /* 偏绿的米白文字 */
+  --muted: #8d958e;
+  --line: #2c322f;
+  --lamp: #d9b26a;       /* 路灯/指示灯的暖黄，唯一强调色 */
+  --serif: "Noto Serif SC", "Songti SC", "STSong", serif;
+  --sans: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+/* 日文版换成日文字形 */
+html[lang="ja"] {
+  --serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --sans: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+img { max-width: 100%; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; transition: none !important; } }
+body {
+  background: var(--ink); color: var(--paper);
+  font-family: var(--sans); font-weight: 300; font-size: 16px; line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1120px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: inherit; }
+a:focus-visible { outline: 2px solid var(--lamp); outline-offset: 4px; }
+
+
+/* 路线：左侧细线 */
+.route { position: relative; }
+.route::before {
+  content: ""; position: absolute; z-index: 1; top: 0; bottom: 0;
+  left: max(16px, env(safe-area-inset-left, 0px));
+  width: 1px; background: var(--line);
+}
+@media (min-width: 1152px) { .route::before { left: calc((100% - 1120px) / 2 + 16px); } }
+.stop { position: relative; padding-left: 36px; }
+.stop::before {
+  content: ""; position: absolute; left: -4px; top: .7em;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--ink); border: 1px solid var(--lamp);
+}
+
+/* 首屏：新干线照片作背景，左侧压暗保证文字可读 */
+.hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding-block: 96px; overflow: hidden; isolation: isolate; }
+.hero > .wrap { width: 100%; }
+.hero .bg { position: absolute; inset: 0; z-index: -1; }
+.hero .bg img { width: 100%; height: 100%; max-width: 100%; object-fit: cover; object-position: 62% 55%; display: block; }
+.hero .bg::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(21,23,22,.92) 0%, rgba(21,23,22,.72) 38%, rgba(21,23,22,.25) 70%, rgba(21,23,22,.1) 100%),
+              linear-gradient(180deg, rgba(21,23,22,0) 60%, var(--ink) 100%); }
+.hero .credit { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 20px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .06em; color: rgba(233,235,228,.5); }
+.hero .brand {
+  font-family: var(--serif); font-weight: 900;
+  font-size: clamp(40px, 10.5vw, 136px); line-height: .95; letter-spacing: -.02em;
+  margin: 0; white-space: nowrap;
+}
+.hero .brand span { color: var(--lamp); }
+.hero .slogan {
+  font-family: var(--serif); font-weight: 600;
+  font-size: clamp(26px, 4.2vw, 52px); line-height: 1.3; letter-spacing: .04em;
+  margin: 28px 0 0; text-wrap: balance;
+}
+.hero .slogan .dim { color: var(--muted); font-weight: 400; }
+.hero .sub { margin: 32px 0 0; font-size: clamp(17px, 2vw, 20px); color: var(--paper); max-width: 32em; }
+.hero .sub small { display: block; color: var(--muted); font-size: 15px; margin-top: 4px; }
+.status {
+  display: inline-flex; align-items: center; gap: 10px; margin-top: 48px;
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em; color: var(--muted);
+}
+.status i { width: 7px; height: 7px; border-radius: 50%; background: var(--lamp); box-shadow: 0 0 0 0 var(--lamp); animation: blink 2.4s ease-out infinite; }
+@keyframes blink { 0% { box-shadow: 0 0 0 0 rgba(217,178,106,.6); } 70%,100% { box-shadow: 0 0 0 10px rgba(217,178,106,0); } }
+
+/* 段落标题 */
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; color: var(--lamp); text-transform: uppercase; margin: 0 0 14px; }
+h2 { font-family: var(--serif); font-weight: 600; font-size: clamp(34px, 5vw, 60px); line-height: 1.15; margin: 0; }
+.lede { color: var(--muted); max-width: 26em; margin: 14px 0 0; font-size: 16px; }
+
+/* 滚动舞台：外层留出滚动距离，内层吸顶，照片铺满整屏，按进度切换 */
+.scrolly { position: relative; height: calc(var(--n) * 80svh + 100svh); }
+.stage { position: sticky; top: 0; height: 100svh; overflow: hidden; isolation: isolate; display: flex; align-items: flex-end; }
+.stage > .wrap { width: 100%; padding-block: 0 12svh; }
+.layer { grid-area: 1 / 1; transition: opacity .8s ease, transform 1.2s ease; }
+.layer:not(.on) { opacity: 0; pointer-events: none; }
+.bgs { position: absolute; inset: 0; z-index: -1; display: grid; }
+.bgs .layer { position: relative; overflow: hidden; }
+.bgs img { width: 100%; height: 100%; max-width: 100%; object-fit: cover; display: block; }
+.bgs .layer:not(.on) { transform: scale(1.06); }
+.bgs .layer.on { transform: scale(1); }
+.bgs::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(21,23,22,.35) 0%, rgba(21,23,22,0) 30%, rgba(21,23,22,.2) 55%, rgba(21,23,22,.88) 100%),
+              linear-gradient(90deg, rgba(21,23,22,.55) 0%, rgba(21,23,22,0) 55%); }
+.copy { padding-left: 36px; max-width: 44em; }
+
+/* 在路上 */
+#road h2 { text-shadow: 0 2px 24px rgba(0,0,0,.35); }
+.caps { display: grid; margin-top: 24px; }
+.count { font-family: var(--mono); font-size: 13px; color: rgba(233,235,228,.75); letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.count b { color: var(--lamp); font-weight: 500; }
+.ticks { display: flex; gap: 6px; margin-top: 16px; max-width: 320px; }
+.ticks i { height: 2px; flex: 1; background: rgba(233,235,228,.25); transition: background .4s; }
+.ticks i.on { background: var(--lamp); }
+
+/* 在线上：主机照片铺底，压暗更多 */
+#line .bgs img { object-position: 40% 50%; }
+#line .bgs::after { background: linear-gradient(90deg, rgba(21,23,22,.9) 0%, rgba(21,23,22,.75) 45%, rgba(21,23,22,.35) 100%), linear-gradient(180deg, rgba(21,23,22,0) 50%, rgba(21,23,22,.85) 100%); }
+#line .stage { align-items: center; }
+#line .stage > .wrap { padding-block: 0; }
+.svc-index { list-style: none; margin: 32px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: rgba(233,235,228,.55); }
+.svc-index li { transition: color .4s; }
+.svc-index li::before { content: "○ "; }
+.svc-index li.on { color: var(--paper); }
+.svc-index li.on::before { content: "● "; color: var(--lamp); }
+.svc { display: grid; margin-top: 24px; border-top: 1px solid rgba(233,235,228,.18); padding-top: 28px; }
+.svc .layer:not(.on) { transform: translateY(16px); }
+.svc h3 { font-family: var(--serif); font-weight: 900; font-size: clamp(36px, 6vw, 76px); line-height: 1.15; margin: 0; }
+.svc p { margin: 14px 0 0; color: rgba(233,235,228,.75); font-size: 17px; max-width: 24em; }
+
+/* 结尾 */
+.coda { padding-block: 40px 96px; }
+.coda p { font-family: var(--serif); font-size: clamp(24px, 3.4vw, 36px); line-height: 1.5; margin: 0; max-width: 18em; text-wrap: balance; }
+footer { border-top: 1px solid var(--line); padding-block: 28px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+footer a { text-decoration: none; }
+footer a:hover { color: var(--paper); }
+
+@media (max-width: 760px) {
+  .hero .bg img { object-position: 70% 55%; }
+  .hero .bg::after { background: linear-gradient(180deg, rgba(21,23,22,.55) 0%, rgba(21,23,22,.85) 100%); }
+  .hero { padding-block: 72px; }
+  .bgs img { object-position: 55% 50%; }
+  #line .bgs img { object-position: 35% 50%; }
+  .lede { display: none; }
+}
+
+/* 页脚语言切换 */
+.langs { display: flex; gap: 14px; }
+.langs a { text-decoration: none; color: var(--muted); }
+.langs a[aria-current="true"] { color: var(--paper); }
+.langs a:hover { color: var(--paper); }
+html[lang="ja"] .hero .slogan { letter-spacing: .02em; }

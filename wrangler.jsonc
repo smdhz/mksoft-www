@@ -1,0 +1,9 @@
+{
+  "name": "mksoft-www",
+  "compatibility_date": "2025-09-01",
+  // 只托管构建好的静态文件；/ja/ 等路径都回落到 index.html，由页面自己判断语言
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
